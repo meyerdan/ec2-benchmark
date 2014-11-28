@@ -8,7 +8,7 @@ function start_process {
   local proc_key=$2
   local instances=$3
   for i in $(seq 1 $instances); do
-    curl --silent --output /dev/null -H "Content-Type: application/json" -d "{}" http://${hostname}/engine-rest/process-definition/key/${proc_key}/start &
+    curl -sL -w "%{http_code} %{url_effective}\\n" -o /dev/null -H "Content-Type: application/json" -d "{}" http://${hostname}/engine-rest/process-definition/key/${proc_key}/start &
   done
 }
 
