@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.benchmark.plugin.MetricsPlugin;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 
 /**
@@ -44,10 +45,24 @@ public class MetricsServlet extends HttpServlet {
   }
 
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    if(req.getRequestURI().endsWith("stop")) {
+    String requestURI = req.getRequestURI();
+    if(requestURI.endsWith("stop")) {
       writeAggregationsToResponse(resp);
+      getMetricsPlugin().getCommandCounter().clear();
+      System.out.println("STOP metrics");
     }
-    getMetricsPlugin().getCommandCounter().clear();
+    else if(requestURI.endsWith("start")) {
+      getMetricsPlugin().getCommandCounter().clear();
+      System.out.println("START metrics");
+    }
+    else if(requestURI.endsWith("enableCache")) {
+      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(false);
+      System.out.println("cache reuse ENABLED");
+    }
+    else if(requestURI.endsWith("disableCache")) {
+      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(true);
+      System.out.println("cache reuse DISABLED");
+    }
   }
 
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -69,14 +84,18 @@ public class MetricsServlet extends HttpServlet {
   }
 
   protected MetricsPlugin getMetricsPlugin() {
-    ProcessEngineImpl processEngine = (ProcessEngineImpl) BpmPlatform.getDefaultProcessEngine();
-    List<ProcessEnginePlugin> processEnginePlugins = processEngine.getProcessEngineConfiguration().getProcessEnginePlugins();
+    List<ProcessEnginePlugin> processEnginePlugins = getProcessEngineConfiguration().getProcessEnginePlugins();
     for (ProcessEnginePlugin processEnginePlugin : processEnginePlugins) {
       if(processEnginePlugin instanceof MetricsPlugin) {
         return (MetricsPlugin) processEnginePlugin;
       }
     }
     return null;
+  }
+
+  private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
+    ProcessEngineImpl processEngine = (ProcessEngineImpl) BpmPlatform.getDefaultProcessEngine();
+    return processEngine.getProcessEngineConfiguration();
   }
 
 }
