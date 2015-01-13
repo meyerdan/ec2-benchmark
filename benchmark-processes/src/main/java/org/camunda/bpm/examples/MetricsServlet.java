@@ -42,6 +42,8 @@ public class MetricsServlet extends HttpServlet {
     if(getMetricsPlugin() == null) {
       throw new RuntimeException("Could not detect MetricsPlugin.");
     }
+
+    getProcessEngineConfiguration().getJobExecutor().setMaxJobsPerAcquisition(20);
   }
 
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -56,11 +58,11 @@ public class MetricsServlet extends HttpServlet {
       System.out.println("START metrics");
     }
     else if(requestURI.endsWith("enableCache")) {
-      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(false);
+      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(true);
       System.out.println("cache reuse ENABLED");
     }
     else if(requestURI.endsWith("disableCache")) {
-      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(true);
+      getProcessEngineConfiguration().setDbEntityCacheReuseEnabled(false);
       System.out.println("cache reuse DISABLED");
     }
   }
