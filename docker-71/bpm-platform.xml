@@ -12,7 +12,7 @@
     <datasource>java:jdbc/ProcessEngine</datasource>
 
     <properties>
-      <property name="history">full</property>
+      <property name="history">none</property>
       <property name="databaseSchemaUpdate">true</property>
       <property name="authorizationEnabled">true</property>
       <property name="jobExecutorDeploymentAware">true</property>
